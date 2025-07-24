@@ -200,7 +200,8 @@ export const SelectedShapeActions = ({
             renderAction("changeTextAlign")}
         </>
       )}
-
+       {appState.activeTool.type === "eraser" && renderAction("changeEraserTargets")}
+       
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
@@ -504,4 +505,16 @@ export const ExitZenModeAction = ({
   >
     {t("buttons.exitZenMode")}
   </button>
+);
+
+export const FinalizeAction = ({
+  renderAction,
+  className,
+}: {
+  renderAction: ActionManager["renderAction"];
+  className?: string;
+}) => (
+  <div className={`finalize-button ${className}`}>
+    {renderAction("finalize", { size: "small" })}
+  </div>
 );

@@ -36,7 +36,6 @@ export const APP_NAME = "Excalidraw";
 // (happens a lot with fast clicks with the text tool)
 export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
 export const DRAGGING_THRESHOLD = 10; // px
-export const MINIMUM_ARROW_SIZE = 20; // px
 export const LINE_CONFIRM_THRESHOLD = 8; // px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
@@ -50,6 +49,7 @@ export const CURSOR_TYPE = {
   GRAB: "grab",
   POINTER: "pointer",
   MOVE: "move",
+  ZOOM_IN: "zoom-in",
   AUTO: "",
 };
 export const POINTER_BUTTON = {
@@ -250,6 +250,7 @@ export const IMAGE_MIME_TYPES = {
   ico: "image/x-icon",
   avif: "image/avif",
   jfif: "image/jfif",
+  pdf: "application/pdf"
 } as const;
 
 export const MIME_TYPES = {
@@ -433,7 +434,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "solid",
-  strokeWidth: 2,
+  strokeWidth: 1,//默认粗细
   strokeStyle: "solid",
   roughness: ROUGHNESS.artist,
   opacity: 100,

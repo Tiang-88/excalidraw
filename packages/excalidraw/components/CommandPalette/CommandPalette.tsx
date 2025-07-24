@@ -59,8 +59,6 @@ import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { useStable } from "../../hooks/useStable";
 
-import { Ellipsify } from "../Ellipsify";
-
 import * as defaultItems from "./defaultCommandPaletteItems";
 
 import "./CommandPalette.scss";
@@ -966,7 +964,7 @@ const CommandItem = ({
             }
           />
         )}
-        <Ellipsify>{command.label}</Ellipsify>
+        {command.label}
       </div>
       {showShortcut && command.shortcut && (
         <CommandShortcutHint shortcut={command.shortcut} />

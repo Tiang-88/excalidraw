@@ -59,7 +59,7 @@ const MenuContent = ({
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": device.editor.isMobile,
   }).trim();
-
+//  const styles = { ...style, display: 'block' };按钮打不开问题
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
       <div

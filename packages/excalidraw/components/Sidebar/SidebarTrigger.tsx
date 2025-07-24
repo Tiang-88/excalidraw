@@ -41,6 +41,7 @@ export const SidebarTrigger = ({
         {icon && <div>{icon}</div>}
         {children && <div className="sidebar-trigger__label">{children}</div>}
       </div>
+      
     </label>
   );
 };

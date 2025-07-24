@@ -100,7 +100,6 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
-  MINIMUM_ARROW_SIZE,
 } from "@excalidraw/common";
 
 import {
@@ -461,6 +460,8 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
+import { pdfToSvgs } from "../pdf/pdfToSvgs";
+
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -529,6 +530,8 @@ let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+let isHoldingZ: boolean = false;
+let isZooming: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
@@ -1260,14 +1263,13 @@ class App extends React.Component<AppProps, AppState> {
                         src?.type !== "document" ? src?.link ?? "" : undefined
                       }
                       // https://stackoverflow.com/q/18470015
-                      scrolling="no"
+                      //网页滚动
+                      scrolling="yes"
                       referrerPolicy="no-referrer-when-downgrade"
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen={true}
-                      sandbox={`${
-                        src?.sandbox?.allowSameOrigin ? "allow-same-origin" : ""
-                      } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads"
                     />
                   )}
                 </div>
@@ -4502,7 +4504,13 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
         event.preventDefault();
       }
-
+ if (event.key === KEYS.Z && gesture.pointers.size === 0) {
+        isHoldingZ = true;
+        if (!isHoldingSpace) {
+          setCursor(this.interactiveCanvas, CURSOR_TYPE.ZOOM_IN);
+        }
+        event.preventDefault();
+      }
       if (
         (event.key === KEYS.G || event.key === KEYS.S) &&
         !event.altKey &&
@@ -4594,7 +4602,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
-      if (
+      if (isHoldingZ === true) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.ZOOM_IN);
+      } else if (
         this.state.viewModeEnabled ||
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
@@ -4614,6 +4624,22 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
       isHoldingSpace = false;
+    }
+     if (event.key === KEYS.Z) {
+      if (this.state.viewModeEnabled) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else if (this.state.activeTool.type === "selection") {
+        resetCursor(this.interactiveCanvas);
+      } else {
+        setCursorForShape(this.interactiveCanvas, this.state);
+        this.setState({
+          selectedElementIds: makeNextSelectedElementIds({}, this.state),
+          selectedGroupIds: {},
+          editingGroupId: null,
+          activeEmbeddable: null,
+        });
+      }
+      isHoldingZ = false;
     }
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
@@ -4715,7 +4741,7 @@ class App extends React.Component<AppProps, AppState> {
     const nextActiveTool = updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-    } else if (!isHoldingSpace) {
+     } else if (!isHoldingSpace && !isHoldingZ) {
       setCursorForShape(this.interactiveCanvas, {
         ...this.state,
         activeTool: nextActiveTool,
@@ -4926,17 +4952,7 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
-
-        if (isDeleted && !isExistingElement) {
-          // let's just remove the element from the scene, as it's an empty just created text element
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((x) => x.id !== element.id),
-          );
-        } else {
-          updateElement(nextOriginalText, isDeleted);
-        }
+        updateElement(nextOriginalText, isDeleted);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -4965,10 +4981,9 @@ class App extends React.Component<AppProps, AppState> {
             element,
           ]);
         }
-
-        // we need to record either way, whether the text element was added or removed
-        // since we need to sync this delta to other clients, otherwise it would end up with inconsistencies
-        this.store.scheduleCapture();
+        if (!isDeleted || isExistingElement) {
+          this.store.scheduleCapture();
+        }
 
         flushSync(() => {
           this.setState({
@@ -5783,6 +5798,8 @@ class App extends React.Component<AppProps, AppState> {
     if (
       isHoldingSpace ||
       isPanning ||
+       isHoldingZ ||
+      isZooming ||
       isDraggingScrollBar ||
       isHandToolActive(this.state)
     ) {
@@ -5868,9 +5885,6 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this,
       );
-      const linearElement = editingLinearElement
-        ? this.scene.getElement(editingLinearElement.elementId)
-        : null;
 
       if (
         editingLinearElement &&
@@ -5885,17 +5899,16 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-      if (
-        editingLinearElement?.lastUncommittedPoint != null &&
-        linearElement &&
-        isBindingElementType(linearElement.type)
-      ) {
+      if (editingLinearElement?.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(
           scenePointer,
           editingLinearElement.elbowed,
         );
-      } else if (this.state.suggestedBindings.length) {
-        this.setState({ suggestedBindings: [] });
+      } else {
+        // causes stack overflow if not sync
+        flushSync(() => {
+          this.setState({ suggestedBindings: [] });
+        });
       }
     }
 
@@ -6160,6 +6173,15 @@ class App extends React.Component<AppProps, AppState> {
       } else if (isOverScrollBar) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (
+        this.state.selectedLinearElement &&
+        hitElement?.id === this.state.selectedLinearElement.elementId
+      ) {
+        this.handleHoverSelectedLinearElement(
+          this.state.selectedLinearElement,
+          scenePointerX,
+          scenePointerY,
+        );
+      } else if (
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD]
       ) {
@@ -6199,14 +6221,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
-      }
-
-      if (this.state.selectedLinearElement) {
-        this.handleHoverSelectedLinearElement(
-          this.state.selectedLinearElement,
-          scenePointerX,
-          scenePointerY,
-        );
       }
     }
 
@@ -6465,7 +6479,7 @@ class App extends React.Component<AppProps, AppState> {
       this.device = updateObject(this.device, { isTouchScreen: true });
     }
 
-    if (isPanning) {
+     if (isPanning || isZooming) {
       return;
     }
 
@@ -6477,7 +6491,9 @@ class App extends React.Component<AppProps, AppState> {
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
     }
-
+ if (this.handleCanvasZoomUsingZDrag(event)) {
+      return;
+    }
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
@@ -6891,6 +6907,73 @@ class App extends React.Component<AppProps, AppState> {
     return true;
   };
 
+  // Returns whether the event is a zooming
+  public handleCanvasZoomUsingZDrag = (
+    event: React.PointerEvent<HTMLElement> | MouseEvent,
+  ): boolean => {
+    if (
+      event.button === POINTER_BUTTON.WHEEL || !isHoldingZ
+    ) {
+      return false;
+    }
+    isZooming = true;
+    event.preventDefault();
+
+    let { clientX: lastX, clientY: lastY } = event;
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const deltaX = lastX - event.clientX;
+      const deltaY = lastY - event.clientY;
+
+      lastX = event.clientX;
+      lastY = event.clientY;
+
+      const newZoom =
+        this.state.zoom.value +
+        (deltaY / 500) * this.state.zoom.value -
+        (deltaX / 500) * this.state.zoom.value;
+
+      this.translateCanvas((state) => ({
+        ...getStateForZoom(
+          {
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
+            nextZoom: getNormalizedZoom(newZoom),
+          },
+          state,
+        ),
+        shouldCacheIgnoreZoom: true,
+      }));
+      this.resetShouldCacheIgnoreZoomDebounced();
+    });
+    const teardown = withBatchedUpdates(
+      (lastPointerUp = () => {
+        lastPointerUp = null;
+        isZooming = false;
+        if (!isHoldingZ) {
+          if (this.state.viewModeEnabled) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+          } else {
+            setCursorForShape(this.interactiveCanvas, this.state);
+          }
+        }
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
+        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.removeEventListener(EVENT.POINTER_UP, teardown);
+        window.removeEventListener(EVENT.BLUR, teardown);
+        onPointerMove.flush();
+      }),
+    );
+    window.addEventListener(EVENT.BLUR, teardown);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      passive: true,
+    });
+    window.addEventListener(EVENT.POINTER_UP, teardown);
+
+    return true;
+  };
   private updateGestureOnPointerDown(
     event: React.PointerEvent<HTMLElement>,
   ): void {
@@ -7642,13 +7725,28 @@ class App extends React.Component<AppProps, AppState> {
     sceneX,
     sceneY,
     addToFrameUnderCursor = true,
+     fixedScale,
     imageFile,
   }: {
     sceneX: number;
     sceneY: number;
+    fixedScale?: number;
     addToFrameUnderCursor?: boolean;
     imageFile: File;
   }) => {
+    if (imageFile.type === MIME_TYPES.pdf) {
+      let createImageAtChain = Promise.resolve({ x: sceneX, y: sceneY })
+
+      await pdfToSvgs(imageFile, (svg) => {
+        createImageAtChain = createImageAtChain.then(async ({ x, y }) => {
+          const image = await this.createImageElement({ sceneX: x, sceneY: y, fixedScale: 4.0, imageFile: svg })
+          return { x: x, y: y + image!.height }
+        })
+      })
+
+      await createImageAtChain
+      return
+    }
     const [gridX, gridY] = getGridPoint(
       sceneX,
       sceneY,
@@ -7687,6 +7785,7 @@ class App extends React.Component<AppProps, AppState> {
     const initializedImageElement = await this.insertImageElement(
       placeholderImageElement,
       imageFile,
+       fixedScale
     );
 
     return initializedImageElement;
@@ -8098,12 +8197,16 @@ class App extends React.Component<AppProps, AppState> {
           this.scene,
         );
 
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
-            segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
-            pointerDownState: ret.pointerDownState,
-          },
+        flushSync(() => {
+          if (this.state.selectedLinearElement) {
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
+                pointerDownState: ret.pointerDownState,
+              },
+            });
+          }
         });
         return;
       }
@@ -8162,9 +8265,7 @@ class App extends React.Component<AppProps, AppState> {
           pointDistance(
             pointFrom(pointerCoords.x, pointerCoords.y),
             pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-          ) *
-            this.state.zoom.value <
-          MINIMUM_ARROW_SIZE
+          ) < DRAGGING_THRESHOLD
         ) {
           return;
         }
@@ -8617,21 +8718,23 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (event.altKey) {
-          this.setActiveTool(
-            { type: "lasso", fromSelection: true },
-            event.shiftKey,
-          );
-          this.lassoTrail.startPath(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            event.shiftKey,
-          );
-          this.setAppState({
-            selectionElement: null,
+          flushSync(() => {
+            this.setActiveTool(
+              { type: "lasso", fromSelection: true },
+              event.shiftKey,
+            );
+            this.lassoTrail.startPath(
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+              event.shiftKey,
+            );
+            this.setAppState({
+              selectionElement: null,
+            });
           });
-          return;
+        } else {
+          this.maybeDragNewGenericElement(pointerDownState, event);
         }
-        this.maybeDragNewGenericElement(pointerDownState, event);
       } else if (this.state.activeTool.type === "lasso") {
         if (!event.altKey && this.state.activeTool.fromSelection) {
           this.setActiveTool({ type: "selection" });
@@ -9113,54 +9216,25 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        const dragDistance =
-          pointDistance(
-            pointFrom(pointerCoords.x, pointerCoords.y),
-            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-          ) * this.state.zoom.value;
+        if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
+          this.scene.mutateElement(
+            newElement,
+            {
+              points: [
+                ...newElement.points,
+                pointFrom<LocalPoint>(
+                  pointerCoords.x - newElement.x,
+                  pointerCoords.y - newElement.y,
+                ),
+              ],
+            },
+            { informMutation: false, isDragging: false },
+          );
 
-        if (
-          (!pointerDownState.drag.hasOccurred ||
-            dragDistance < MINIMUM_ARROW_SIZE) &&
-          newElement &&
-          !multiElement
-        ) {
-          if (this.device.isTouchScreen) {
-            const FIXED_DELTA_X = Math.min(
-              (this.state.width * 0.7) / this.state.zoom.value,
-              100,
-            );
-
-            this.scene.mutateElement(
-              newElement,
-              {
-                x: newElement.x - FIXED_DELTA_X / 2,
-                points: [
-                  pointFrom<LocalPoint>(0, 0),
-                  pointFrom<LocalPoint>(FIXED_DELTA_X, 0),
-                ],
-              },
-              { informMutation: false, isDragging: false },
-            );
-
-            this.actionManager.executeAction(actionFinalize);
-          } else {
-            const dx = pointerCoords.x - newElement.x;
-            const dy = pointerCoords.y - newElement.y;
-
-            this.scene.mutateElement(
-              newElement,
-              {
-                points: [...newElement.points, pointFrom<LocalPoint>(dx, dy)],
-              },
-              { informMutation: false, isDragging: false },
-            );
-
-            this.setState({
-              multiElement: newElement,
-              newElement,
-            });
-          }
+          this.setState({
+            multiElement: newElement,
+            newElement,
+          });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
             isBindingEnabled(this.state) &&
@@ -9850,6 +9924,7 @@ class App extends React.Component<AppProps, AppState> {
   private initializeImage = async (
     placeholderImageElement: ExcalidrawImageElement,
     imageFile: File,
+    fixedScale?: number,
   ) => {
     // at this point this should be guaranteed image file, but we do this check
     // to satisfy TS down the line
@@ -9954,6 +10029,7 @@ class App extends React.Component<AppProps, AppState> {
             const naturalDimensions = this.getImageNaturalDimensions(
               initializedImageElement,
               imageHTML,
+               fixedScale,
             );
 
             // no need to create a new instance anymore, just assign the natural dimensions
@@ -9995,6 +10071,7 @@ class App extends React.Component<AppProps, AppState> {
   private insertImageElement = async (
     placeholderImageElement: ExcalidrawImageElement,
     imageFile: File,
+    fixedScale?: number,
   ) => {
     // we should be handling all cases upstream, but in case we forget to handle
     // a future case, let's throw here
@@ -10009,6 +10086,7 @@ class App extends React.Component<AppProps, AppState> {
       const initializedImageElement = await this.initializeImage(
         placeholderImageElement,
         imageFile,
+         fixedScale,
       );
 
       const nextElements = this.scene
@@ -10095,17 +10173,22 @@ class App extends React.Component<AppProps, AppState> {
   private getImageNaturalDimensions = (
     imageElement: ExcalidrawImageElement,
     imageHTML: HTMLImageElement,
+    fixedScale?: number,
   ) => {
-    const minHeight = Math.max(this.state.height - 120, 160);
-    // max 65% of canvas height, clamped to <300px, vh - 120px>
-    const maxHeight = Math.min(
-      minHeight,
-      Math.floor(this.state.height * 0.5) / this.state.zoom.value,
-    );
+    let height = imageHTML.naturalHeight * (fixedScale || 1.0);
+    let width = imageHTML.naturalWidth * (fixedScale || 1.0);
+    if (!fixedScale) {
+      const minHeight = Math.max(this.state.height - 120, 160);
+      // max 65% of canvas height, clamped to <300px, vh - 120px>
+      const maxHeight = Math.min(
+        minHeight,
+        Math.floor(this.state.height * 0.5) / this.state.zoom.value,
+      );
 
-    const height = Math.min(imageHTML.naturalHeight, maxHeight);
-    const width = height * (imageHTML.naturalWidth / imageHTML.naturalHeight);
 
+    height = Math.min(imageHTML.naturalHeight, maxHeight);
+      width = height * (imageHTML.naturalWidth / imageHTML.naturalHeight);
+    }
     // add current imageElement width/height to account for previous centering
     // of the placeholder image
     const x = imageElement.x + imageElement.width / 2 - width / 2;
@@ -10978,7 +11061,7 @@ class App extends React.Component<AppProps, AppState> {
 
       event.preventDefault();
 
-      if (isPanning) {
+       if (isPanning || isZooming) {
         return;
       }
 

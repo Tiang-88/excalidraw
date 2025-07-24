@@ -150,7 +150,7 @@ describe("regression tests", () => {
         expect(h.state.activeTool.type).toBe(shape);
 
         mouse.down(10, 10);
-        mouse.up(30, 30);
+        mouse.up(10, 10);
 
         if (shouldSelect) {
           expect(API.getSelectedElement().type).toBe(shape);

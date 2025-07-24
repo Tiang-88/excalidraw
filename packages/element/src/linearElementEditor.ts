@@ -1040,12 +1040,10 @@ export class LinearElementEditor {
       if (lastPoint === lastUncommittedPoint) {
         LinearElementEditor.deletePoints(element, app, [points.length - 1]);
       }
-      return appState.editingLinearElement.lastUncommittedPoint
-        ? {
-            ...appState.editingLinearElement,
-            lastUncommittedPoint: null,
-          }
-        : appState.editingLinearElement;
+      return {
+        ...appState.editingLinearElement,
+        lastUncommittedPoint: null,
+      };
     }
 
     let newPoint: LocalPoint;

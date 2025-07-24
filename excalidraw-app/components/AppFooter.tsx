@@ -12,18 +12,9 @@ export const AppFooter = React.memo(
     return (
       <Footer>
         <div
-          style={{
-            display: "flex",
-            gap: ".5rem",
-            alignItems: "center",
-          }}
+         
         >
-          {isVisualDebuggerEnabled() && <DebugFooter onChange={onChange} />}
-          {isExcalidrawPlusSignedUser ? (
-            <ExcalidrawPlusAppLink />
-          ) : (
-            <EncryptedIcon />
-          )}
+         {/* 页脚 */}
         </div>
       </Footer>
     );

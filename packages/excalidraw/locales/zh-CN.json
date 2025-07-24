@@ -67,6 +67,8 @@
     "architect": "朴素",
     "artist": "艺术",
     "cartoonist": "漫画家",
+    "eraserTargets": "橡皮擦目标选择器",
+
     "fileTitle": "文件名",
     "colorPicker": "取色器",
     "canvasColors": "画布上的",
@@ -172,7 +174,7 @@
     "darkMode": "深色模式",
     "lightMode": "浅色模式",
     "zenMode": "禅模式",
-    "objectsSnapMode": "吸附至对象",
+    "objectsSnapMode": "吸附到对象",
     "exitZenMode": "退出禅模式",
     "cancel": "取消",
     "clear": "清除",

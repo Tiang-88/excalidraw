@@ -1,8 +1,6 @@
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
-import { getSelectedElementsByGroup } from "./groups";
+import { getMaximumGroups } from "./groups";
 
 import type { Scene } from "./Scene";
 
@@ -18,12 +16,11 @@ export const alignElements = (
   selectedElements: ExcalidrawElement[],
   alignment: Alignment,
   scene: Scene,
-  appState: Readonly<AppState>,
 ): ExcalidrawElement[] => {
-  const groups: ExcalidrawElement[][] = getSelectedElementsByGroup(
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const groups: ExcalidrawElement[][] = getMaximumGroups(
     selectedElements,
-    scene.getNonDeletedElementsMap(),
-    appState,
+    elementsMap,
   );
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
 

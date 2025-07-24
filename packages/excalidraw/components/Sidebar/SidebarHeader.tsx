@@ -51,6 +51,7 @@ export const SidebarHeader = ({
         >
           {CloseIcon}
         </Button>
+        
       </div>
     </div>
   );

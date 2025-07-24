@@ -182,7 +182,7 @@ if (window.self !== window.top) {
     const parentUrl = new URL(document.referrer);
     const currentUrl = new URL(window.location.href);
     if (parentUrl.origin === currentUrl.origin) {
-      isSelfEmbedding = true;
+      isSelfEmbedding = false;
     }
   } catch (error) {
     // ignore
@@ -231,9 +231,7 @@ const initializeScene = async (opts: {
       // don't prompt if scene is empty
       !scene.elements.length ||
       // don't prompt for collab scenes because we don't override local storage
-      roomLinkData ||
-      // otherwise, prompt whether user wants to override current scene
-      (await openConfirmModal(shareableLinkConfirmDialog))
+      roomLinkData 
     ) {
       if (jsonBackendMatch) {
         scene = await loadScene(
@@ -271,8 +269,7 @@ const initializeScene = async (opts: {
       const request = await fetch(window.decodeURIComponent(url));
       const data = await loadFromBlob(await request.blob(), null, null);
       if (
-        !scene.elements.length ||
-        (await openConfirmModal(shareableLinkConfirmDialog))
+        !scene.elements.length
       ) {
         return { scene: data, isExternalScene };
       }
@@ -805,6 +802,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+      validateEmbeddable={() => true}//网站嵌入验证
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
@@ -862,6 +860,8 @@ const ExcalidrawWrapper = () => {
                 }
               />
             </div>
+            
+            
           );
         }}
         onLinkOpen={(element, event) => {

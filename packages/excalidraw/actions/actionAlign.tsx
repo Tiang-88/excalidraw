@@ -10,8 +10,6 @@ import { alignElements } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { getSelectedElementsByGroup } from "@excalidraw/element";
-
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Alignment } from "@excalidraw/element";
@@ -40,11 +38,7 @@ export const alignActionsPredicate = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
-    getSelectedElementsByGroup(
-      selectedElements,
-      app.scene.getNonDeletedElementsMap(),
-      appState as Readonly<AppState>,
-    ).length > 1 &&
+    selectedElements.length > 1 &&
     // TODO enable aligning frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );
@@ -58,12 +52,7 @@ const alignSelectedElements = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
-  const updatedElements = alignElements(
-    selectedElements,
-    alignment,
-    app.scene,
-    appState,
-  );
+  const updatedElements = alignElements(selectedElements, alignment, app.scene);
 
   const updatedElementsMap = arrayToMap(updatedElements);
 

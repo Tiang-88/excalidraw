@@ -29,7 +29,7 @@ import Trans from "../Trans";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
-import { GithubIcon, DiscordIcon, XBrandIcon } from "../icons";
+import { GithubIcon, DiscordIcon, XBrandIcon, EntrustDirectoryIcon } from "../icons";
 import {
   boltIcon,
   DeviceDesktopIcon,
@@ -45,7 +45,7 @@ import {
   usersIcon,
 } from "../icons";
 
-import "./DefaultItems.scss";
+import { entrustDirectory } from "@excalidraw/excalidraw/data/filesystem";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -126,6 +126,28 @@ export const SaveAsImage = () => {
   );
 };
 SaveAsImage.displayName = "SaveAsImage";
+
+
+export const EntrustDirectory = () => {
+  const setAppState = useExcalidrawSetAppState();
+
+  return (
+    <DropdownMenuItem
+      icon={EntrustDirectoryIcon}
+      data-testid="entrust-directory-button"
+      onSelect={() => {
+        if (!entrustDirectory()) {
+          setAppState({ toast: {
+            message: "无法访问文件夹，请检查权限或浏览器支持",
+          }})
+        }
+      }}
+    >
+     委托目录
+    </DropdownMenuItem>
+  );
+};
+EntrustDirectory.displayName = "EntrustDirectory";
 
 export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();
@@ -339,36 +361,36 @@ export const Export = () => {
 };
 Export.displayName = "Export";
 
-export const Socials = () => {
-  const { t } = useI18n();
+// export const Socials = () => {
+//   const { t } = useI18n();
 
-  return (
-    <>
-      <DropdownMenuItemLink
-        icon={GithubIcon}
-        href="https://github.com/excalidraw/excalidraw"
-        aria-label="GitHub"
-      >
-        GitHub
-      </DropdownMenuItemLink>
-      <DropdownMenuItemLink
-        icon={XBrandIcon}
-        href="https://x.com/excalidraw"
-        aria-label="X"
-      >
-        {t("labels.followUs")}
-      </DropdownMenuItemLink>
-      <DropdownMenuItemLink
-        icon={DiscordIcon}
-        href="https://discord.gg/UexuTaE"
-        aria-label="Discord"
-      >
-        {t("labels.discordChat")}
-      </DropdownMenuItemLink>
-    </>
-  );
-};
-Socials.displayName = "Socials";
+//   return (
+//     <>
+//       <DropdownMenuItemLink
+//         icon={GithubIcon}
+//         href="https://github.com/excalidraw/excalidraw"
+//         aria-label="GitHub"
+//       >
+//         GitHub
+//       </DropdownMenuItemLink>
+//       <DropdownMenuItemLink
+//         icon={XBrandIcon}
+//         href="https://x.com/excalidraw"
+//         aria-label="X"
+//       >
+//         {t("labels.followUs")}
+//       </DropdownMenuItemLink>
+//       <DropdownMenuItemLink
+//         icon={DiscordIcon}
+//         href="https://discord.gg/UexuTaE"
+//         aria-label="Discord"
+//       >
+//         {t("labels.discordChat")}
+//       </DropdownMenuItemLink>
+//     </>
+//   );
+// };
+// Socials.displayName = "Socials";
 
 export const LiveCollaborationTrigger = ({
   onSelect,

@@ -27,8 +27,6 @@ import {
   isImageElement,
 } from "./index";
 
-import type { ApplyToOptions } from "./delta";
-
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
@@ -572,15 +570,9 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
-    options: ApplyToOptions = {
-      excludedProperties: new Set(),
-    },
   ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
-      elements,
-      StoreSnapshot.empty().elements,
-      options,
-    );
+    const [nextElements, elementsContainVisibleChange] =
+      delta.elements.applyTo(elements);
 
     const [nextAppState, appStateContainsVisibleChange] =
       delta.appState.applyTo(appState, nextElements);

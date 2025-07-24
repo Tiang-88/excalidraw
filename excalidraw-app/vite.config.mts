@@ -77,7 +77,17 @@ export default defineConfig(({ mode }) => {
         },
       ],
     },
+    optimizeDeps: {
+      exclude: ["mupdf"],
+    },
+    // 设置静态资源路径为 /draw/
+    base: '/draw/',  // 这样会让资源路径变成 /draw/assets/
     build: {
+       chunkSizeWarningLimit: 1000, // 提高警告限制到1000KB
+      target: "esnext",
+      
+    // sourcemap: false,
+
       outDir: "build",
       rollupOptions: {
         output: {
@@ -105,9 +115,12 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      sourcemap: true,
+      sourcemap: false,
       // don't auto-inline small assets (i.e. fonts hosted on CDN)
       assetsInlineLimit: 0,
+    },
+     worker: {
+      format: "es"
     },
     plugins: [
       Sitemap({
@@ -140,6 +153,7 @@ export default defineConfig(({ mode }) => {
         },
 
         workbox: {
+          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 增加到10MB
           // don't precache fonts, locales and separate chunks
           globIgnores: [
             "fonts.css",

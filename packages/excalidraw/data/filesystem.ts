@@ -13,7 +13,11 @@ import type { FileSystemHandle } from "browser-fs-access";
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
 const INPUT_CHANGE_INTERVAL_MS = 500;
-
+declare global {
+  interface Window {
+    showDirectoryPicker(opts: object): Promise<FileSystemDirectoryHandle>;
+  }
+}
 export const fileOpen = <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
@@ -101,6 +105,12 @@ export const fileSave = (
     opts.fileHandle,
   );
 };
-
+export const entrustDirectory = () => {
+  if (nativeFileSystemSupported) {
+    window.showDirectoryPicker({ mode: "readwrite" })
+    return true
+  }
+   else return false
+}
 export { nativeFileSystemSupported };
 export type { FileSystemHandle };

@@ -7,7 +7,6 @@ export const InlineIcon = ({ icon }: { icon: React.ReactNode }) => {
         display: "inline-block",
         lineHeight: 0,
         verticalAlign: "middle",
-        flex: "0 0 auto",
       }}
     >
       {icon}

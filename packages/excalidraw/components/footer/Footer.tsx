@@ -2,7 +2,13 @@ import clsx from "clsx";
 
 import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
-import { ExitZenModeAction, UndoRedoActions, ZoomActions } from "../Actions";
+import {
+  ExitZenModeAction,
+  FinalizeAction,
+  UndoRedoActions,
+  ZoomActions,
+} from "../Actions";
+import { useDevice } from "../App";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -23,10 +29,18 @@ const Footer = ({
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
 
+  const device = useDevice();
+  const showFinalize =
+    !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
+
   return (
     <footer
       role="contentinfo"
       className="layer-ui__wrapper__footer App-menu App-menu_bottom"
+       style={{
+    bottom: "8%",  // 页脚样式距离底部5%视口高度
+  
+  }}
     >
       <div
         className={clsx("layer-ui__wrapper__footer-left zen-mode-transition", {
@@ -46,6 +60,15 @@ const Footer = ({
                 renderAction={actionManager.renderAction}
                 className={clsx("zen-mode-transition", {
                   "layer-ui__wrapper__footer-left--transition-bottom":
+                    appState.zenModeEnabled,
+                })}
+              />
+            )}
+            {showFinalize && (
+              <FinalizeAction
+                renderAction={actionManager.renderAction}
+                className={clsx("zen-mode-transition", {
+                  "layer-ui__wrapper__footer-left--transition-left":
                     appState.zenModeEnabled,
                 })}
               />

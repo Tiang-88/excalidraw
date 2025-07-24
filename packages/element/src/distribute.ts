@@ -1,9 +1,7 @@
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import { getCommonBoundingBox } from "./bounds";
 import { newElementWith } from "./mutateElement";
 
-import { getSelectedElementsByGroup } from "./groups";
+import { getMaximumGroups } from "./groups";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
@@ -16,7 +14,6 @@ export const distributeElements = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   distribution: Distribution,
-  appState: Readonly<AppState>,
 ): ExcalidrawElement[] => {
   const [start, mid, end, extent] =
     distribution.axis === "x"
@@ -24,11 +21,7 @@ export const distributeElements = (
       : (["minY", "midY", "maxY", "height"] as const);
 
   const bounds = getCommonBoundingBox(selectedElements);
-  const groups = getSelectedElementsByGroup(
-    selectedElements,
-    elementsMap,
-    appState,
-  )
+  const groups = getMaximumGroups(selectedElements, elementsMap)
     .map((group) => [group, getCommonBoundingBox(group)] as const)
     .sort((a, b) => a[1][mid] - b[1][mid]);
 

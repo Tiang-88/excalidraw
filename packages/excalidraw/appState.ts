@@ -42,6 +42,13 @@ export const getDefaultAppState = (): Omit<
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
     currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
+     eraserTargets: {
+      //橡皮擦目标选择器
+      freedraw: true,
+      shape: true,
+      text: true,
+      image: false,
+    },
     currentHoveredFontFamily: null,
     cursorButton: "up",
     activeEmbeddable: null,
@@ -103,7 +110,7 @@ export const getDefaultAppState = (): Omit<
     editingFrame: null,
     elementsToHighlight: null,
     toast: null,
-    viewBackgroundColor: COLOR_PALETTE.white,
+    viewBackgroundColor: COLOR_PALETTE.transparent,
     zenModeEnabled: false,
     zoom: {
       value: 1 as NormalizedZoomValue,
@@ -162,6 +169,7 @@ const APP_STATE_STORAGE_CONF = (<
     export: false,
     server: false,
   },
+  eraserTargets: { browser: true, export: false, server: false },
   currentItemOpacity: { browser: true, export: false, server: false },
   currentItemRoughness: { browser: true, export: false, server: false },
   currentItemStartArrowhead: { browser: true, export: false, server: false },

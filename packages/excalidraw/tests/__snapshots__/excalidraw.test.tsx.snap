@@ -15,11 +15,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Click me
-        </span>
+        Click me
       </div>
     </button>
     <a
@@ -31,11 +27,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Excalidraw blog
-        </span>
+        Excalidraw blog
       </div>
     </a>
     <div
@@ -96,11 +88,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Help
-        </span>
+        Help
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -150,11 +138,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Open
-        </span>
+        Open
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -191,11 +175,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Save to...
-        </span>
+        Save to...
       </div>
     </button>
     <button
@@ -251,11 +231,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Export image...
-        </span>
+        Export image...
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -304,11 +280,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Find on canvas
-        </span>
+        Find on canvas
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -365,11 +337,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Help
-        </span>
+        Help
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -406,11 +374,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Reset the canvas
-        </span>
+        Reset the canvas
       </div>
     </button>
     <div
@@ -455,11 +419,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         <div
           class="dropdown-menu-item__text"
         >
-          <span
-            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-          >
-            GitHub
-          </span>
+          GitHub
         </div>
       </a>
       <a
@@ -505,11 +465,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         <div
           class="dropdown-menu-item__text"
         >
-          <span
-            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-          >
-            Follow us
-          </span>
+          Follow us
         </div>
       </a>
       <a
@@ -549,11 +505,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         <div
           class="dropdown-menu-item__text"
         >
-          <span
-            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-          >
-            Discord chat
-          </span>
+          Discord chat
         </div>
       </a>
     </div>
@@ -590,11 +542,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Dark mode
-        </span>
+        Dark mode
       </div>
       <div
         class="dropdown-menu-item__shortcut"
