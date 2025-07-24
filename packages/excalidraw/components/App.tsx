@@ -5897,6 +5897,9 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this,
       );
+      const linearElement = editingLinearElement
+        ? this.scene.getElement(editingLinearElement.elementId)
+        : null;
 
       if (
         editingLinearElement &&
@@ -5911,16 +5914,17 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-      if (editingLinearElement?.lastUncommittedPoint != null) {
+      if (
+        editingLinearElement?.lastUncommittedPoint != null &&
+        linearElement &&
+        isBindingElementType(linearElement.type)
+      ) {
         this.maybeSuggestBindingAtCursor(
           scenePointer,
           editingLinearElement.elbowed,
         );
-      } else {
-        // causes stack overflow if not sync
-        flushSync(() => {
-          this.setState({ suggestedBindings: [] });
-        });
+      } else if (this.state.suggestedBindings.length) {
+        this.setState({ suggestedBindings: [] });
       }
     }
 
@@ -6185,15 +6189,6 @@ class App extends React.Component<AppProps, AppState> {
       } else if (isOverScrollBar) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (
-        this.state.selectedLinearElement &&
-        hitElement?.id === this.state.selectedLinearElement.elementId
-      ) {
-        this.handleHoverSelectedLinearElement(
-          this.state.selectedLinearElement,
-          scenePointerX,
-          scenePointerY,
-        );
-      } else if (
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD]
       ) {
@@ -6233,6 +6228,14 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+      }
+
+      if (this.state.selectedLinearElement) {
+        this.handleHoverSelectedLinearElement(
+          this.state.selectedLinearElement,
+          scenePointerX,
+          scenePointerY,
+        );
       }
     }
 
