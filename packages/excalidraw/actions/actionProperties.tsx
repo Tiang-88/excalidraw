@@ -703,6 +703,7 @@ export const actionChangeFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
   },
+  //默认字体大小
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
@@ -711,25 +712,25 @@ export const actionChangeFontSize = register({
           group="font-size"
           options={[
             {
-              value: 16,
+              value: 20,
               text: t("labels.small"),
               icon: FontSizeSmallIcon,
               testId: "fontSize-small",
             },
             {
-              value: 20,
+              value: 30,
               text: t("labels.medium"),
               icon: FontSizeMediumIcon,
               testId: "fontSize-medium",
             },
             {
-              value: 28,
+              value: 40,
               text: t("labels.large"),
               icon: FontSizeLargeIcon,
               testId: "fontSize-large",
             },
             {
-              value: 36,
+              value: 60,
               text: t("labels.veryLarge"),
               icon: FontSizeExtraLargeIcon,
               testId: "fontSize-veryLarge",
