@@ -2400,7 +2400,82 @@ class App extends React.Component<AppProps, AppState> {
     if (isElementLink(window.location.href)) {
       this.scrollToContent(window.location.href, { animate: false });
     }
+    //pdf在线开始
+    // NEW: 支持 ?pdffile=<url> 在线导入 PDF（将其转换为 SVG 并插入）
+    // 注意：该调用不会阻塞初始化（但会执行 fetch/转换），如果你希望阻塞或显示加载指示，可改为 await 调用并做进度 UI
+    // 这里我们异步触发，不影响主流程
+    this.maybeInsertPdfFromQueryParam().catch((err) => {
+      console.warn("maybeInsertPdfFromQueryParam error:", err);
+    });
   };
+// === BEGIN ADDITION: remote PDF fetch & auto-insert support ===
+// Helper: 从 URL 下载 PDF，并返回 File（用于后续走现有的 createImageElement 流程）
+private fetchPdfFileFromUrl = async (url: string): Promise<File> => {
+  // NOTE: 远程请求必须满足 CORS（Access-Control-Allow-Origin）
+  const resp = await fetch(url, { mode: "cors" });
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch PDF (${resp.status} ${resp.statusText})`);
+  }
+  const blob = await resp.blob();
+  // 有些服务器不返回正确的 content-type，强制默认为 pdf
+  const contentType = blob.type || "application/pdf";
+  let fileName = "remote.pdf";
+  try {
+    const u = new URL(url);
+    const candidate = u.pathname.split("/").pop();
+    if (candidate) {
+      fileName = decodeURIComponent(candidate);
+    }
+  } catch {
+    // ignore
+  }
+  return new File([blob], fileName, { type: contentType });
+};
+
+// Helper: 从 URL param 中读取 pdffile 并尝试插入到画布（复用 createImageElement）
+private async maybeInsertPdfFromQueryParam() {
+  try {
+    const searchParams = new URLSearchParams(window.location.search.slice(1));
+    const pdfUrl = searchParams.get("pdffile");
+    if (!pdfUrl) {
+      return;
+    }
+
+    // 安全/格式化校验（可按需更严格）
+    // if (!/^https?:\/\//i.test(pdfUrl)) {
+    //   this.setState({ errorMessage: "Invalid PDF URL" });
+    //   return;
+    // }
+
+    // 下载 PDF
+    const pdfFile = await this.fetchPdfFileFromUrl(pdfUrl);
+
+    // 放置到画布中心（你也可以通过其他 query param 指定位置）
+    const clientX = this.state.width / 2 + this.state.offsetLeft;
+    const clientY = this.state.height / 2 + this.state.offsetTop;
+    const { x, y } = viewportCoordsToSceneCoords(
+      { clientX, clientY },
+      this.state,
+    );
+
+    // 注意：createImageElement 会在内部检测到 pdf 类型并调用 pdfToSvgs
+    await this.createImageElement({
+      sceneX: x,
+      sceneY: y,
+      imageFile: pdfFile,
+      // 如果你想强制某个缩放因子，可传 fixedScale: number
+    });
+    // 可选：给用户一个 toast 提示已加载
+    this.setToast({ message: "PDF 已导入", duration: 3000 });
+  } catch (err: any) {
+    console.error("Failed to load PDF from URL:", err);
+    this.setState({
+      errorMessage:
+        err?.message || "从 URL 导入 PDF 失败，请检查 CORS 或文件是否可访问",
+    });
+  }
+}
+// pdf在线结束 ===
 
   private isMobileBreakpoint = (width: number, height: number) => {
     return (
