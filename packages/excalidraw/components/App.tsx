@@ -2433,6 +2433,7 @@ private fetchPdfFileFromUrl = async (url: string): Promise<File> => {
 };
 
 // Helper: 从 URL param 中读取 pdffile 并尝试插入到画布（复用 createImageElement）
+// 变更：在开始下载/转换之前清空画布（无确认）
 private async maybeInsertPdfFromQueryParam() {
   try {
     const searchParams = new URLSearchParams(window.location.search.slice(1));
@@ -2446,7 +2447,32 @@ private async maybeInsertPdfFromQueryParam() {
     //   this.setState({ errorMessage: "Invalid PDF URL" });
     //   return;
     // }
-
+// --- 导入在线pdf清理开始 ---
+    // Remove all elements but keep the rest of app state. Also clear files/image cache.
+    try {
+      // clear scene elements
+      this.scene.replaceAllElements([]);
+      // clear editor files and image cache so imported PDF images don't collide with prior ones
+      this.files = {};
+      this.imageCache.clear();
+      // clear any shape cache entries
+      ShapeCache.destroy(); // safe: will recreate when needed
+      // notify renderer / trigger UI update
+      this.scene.triggerUpdate();
+      // register capture for undo/history
+      this.store.scheduleCapture();
+      // clear selection / groups / embeddables
+      this.setState({
+        selectedElementIds: makeNextSelectedElementIds({}, this.state),
+        selectedGroupIds: {},
+        editingGroupId: null,
+        activeEmbeddable: null,
+      });
+    } catch (clearErr) {
+      console.warn("Error while clearing canvas before PDF import:", clearErr);
+      // non-fatal — continue to attempt import
+    }
+    //清理结束
     // 下载 PDF
     const pdfFile = await this.fetchPdfFileFromUrl(pdfUrl);
 
