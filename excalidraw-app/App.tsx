@@ -20,7 +20,6 @@ import {
   APP_NAME,
   EVENT,
   THEME,
-  TITLE_TIMEOUT,
   VERSION_TIMEOUT,
   debounce,
   getVersion,
@@ -496,11 +495,6 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    const titleTimeout = setTimeout(
-      () => (document.title = APP_NAME),
-      TITLE_TIMEOUT,
-    );
-
     const syncData = debounce(() => {
       if (isTestEnv()) {
         return;
@@ -591,7 +585,6 @@ const ExcalidrawWrapper = () => {
         visibilityChange,
         false,
       );
-      clearTimeout(titleTimeout);
     };
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode]);
 
