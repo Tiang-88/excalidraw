@@ -13,9 +13,9 @@ import {
 } from "@excalidraw/excalidraw/components/CommandPalette/CommandPalette";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
 import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
-import { openConfirmModal } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
+// import { openConfirmModal } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
 import { ShareableLinkDialog } from "@excalidraw/excalidraw/components/ShareableLinkDialog";
-import Trans from "@excalidraw/excalidraw/components/Trans";
+// import Trans from "@excalidraw/excalidraw/components/Trans";
 import {
   APP_NAME,
   EVENT,
@@ -188,18 +188,19 @@ if (window.self !== window.top) {
   }
 }
 
-const shareableLinkConfirmDialog = {
-  title: t("overwriteConfirm.modal.shareableLink.title"),
-  description: (
-    <Trans
-      i18nKey="overwriteConfirm.modal.shareableLink.description"
-      bold={(text) => <strong>{text}</strong>}
-      br={() => <br />}
-    />
-  ),
-  actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
-  color: "danger",
-} as const;
+// Commented out as it's not being used
+// const shareableLinkConfirmDialog = {
+//   title: t("overwriteConfirm.modal.shareableLink.title"),
+//   description: (
+//     <Trans
+//       i18nKey="overwriteConfirm.modal.shareableLink.description"
+//       bold={(text) => <strong>{text}</strong>}
+//       br={() => <br />}
+//     />
+//   ),
+//   actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
+//   color: "danger",
+// } as const;
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
@@ -230,7 +231,7 @@ const initializeScene = async (opts: {
       // don't prompt if scene is empty
       !scene.elements.length ||
       // don't prompt for collab scenes because we don't override local storage
-      roomLinkData 
+      roomLinkData
     ) {
       if (jsonBackendMatch) {
         scene = await loadScene(
@@ -267,9 +268,7 @@ const initializeScene = async (opts: {
     try {
       const request = await fetch(window.decodeURIComponent(url));
       const data = await loadFromBlob(await request.blob(), null, null);
-      if (
-        !scene.elements.length
-      ) {
+      if (!scene.elements.length) {
         return { scene: data, isExternalScene };
       }
     } catch (error: any) {
@@ -795,7 +794,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-      validateEmbeddable={() => true}//网站嵌入验证
+        validateEmbeddable={() => true} //网站嵌入验证
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
@@ -853,8 +852,6 @@ const ExcalidrawWrapper = () => {
                 }
               />
             </div>
-            
-            
           );
         }}
         onLinkOpen={(element, event) => {
