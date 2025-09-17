@@ -61,6 +61,7 @@ import {
   frameToolIcon,
   mermaidLogoIcon,
   laserPointerToolIcon,
+  annotationToolIcon,
   MagicIcon,
   LassoIcon,
 } from "./icons";
@@ -296,6 +297,7 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const annotationToolSelected = activeTool.type === "annotation";
   const lassoToolSelected =
     activeTool.type === "lasso" && app.defaultSelectionTool !== "lasso";
 
@@ -376,6 +378,7 @@ export const ShapesSwitcher = ({
               frameToolSelected ||
               embeddableToolSelected ||
               lassoToolSelected ||
+              annotationToolSelected ||
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
@@ -388,6 +391,8 @@ export const ShapesSwitcher = ({
             ? frameToolIcon
             : embeddableToolSelected
             ? EmbedIcon
+            : annotationToolSelected
+            ? annotationToolIcon
             : laserToolSelected && !app.props.isCollaborating
             ? laserPointerToolIcon
             : lassoToolSelected
@@ -424,6 +429,14 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "annotation" })}
+            icon={annotationToolIcon}
+            data-testid="toolbar-annotation"
+            selected={activeTool.type === "annotation"}
+          >
+            Annotation
           </DropdownMenu.Item>
           {app.defaultSelectionTool !== "lasso" && (
             <DropdownMenu.Item

@@ -154,7 +154,8 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "annotation";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -448,6 +449,12 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+
+  /** properties sidebar mode - determines whether to show compact or complete sidebar */
+  stylesPanelMode: "compact" | "full";
+
+  /** controls whether laser trails persist until manually cleared or fade automatically */
+  laserTrailsPersistent: boolean;
 }
 
 export type SearchMatch = {
