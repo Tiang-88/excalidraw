@@ -1,6 +1,9 @@
-git fetch https://github.com/excalidraw/excalidraw.git ac0d3059dc71a05d266b0c89715828fa5a2d9532:temp-commit-678dff2
+git fetch https://github.com/excalidraw/excalidraw.git f55ecb96cc8db9a2417d48cd8077833c3822d64e:temp-commit-678dff2
 
-git cherry-pick ac0d3059dc71a05d266b0c89715828fa5a2d9532
+git cherry-pick f55ecb96cc8db9a2417d48cd8077833c3822d64e
 
 
 纯官方支线
+
+回退
+git cherry-pick --abort
