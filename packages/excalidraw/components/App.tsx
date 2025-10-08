@@ -7419,6 +7419,16 @@ private async maybeInsertPdfFromQueryParam() {
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
         !(
+          isLineElement(selectedElements[0]) &&
+          LinearElementEditor.getPointIndexUnderCursor(
+            selectedElements[0],
+            elementsMap,
+            this.state.zoom,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ) !== -1
+        ) &&
+        !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
         )
