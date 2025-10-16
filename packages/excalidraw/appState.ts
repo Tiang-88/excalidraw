@@ -130,6 +130,8 @@ export const getDefaultAppState = (): Omit<
     searchMatches: null,
     lockedMultiSelections: {},
     activeLockedId: null,
+    stylesPanelMode: "full",
+    laserTrailsPersistent: false,
   };
 };
 
@@ -255,6 +257,8 @@ const APP_STATE_STORAGE_CONF = (<
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
+  stylesPanelMode: { browser: true, export: false, server: false },
+  laserTrailsPersistent: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

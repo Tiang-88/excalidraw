@@ -1142,23 +1142,62 @@ export const StrokeWidthBaseIcon = createIcon(
 );
 
 export const StrokeWidthBoldIcon = createIcon(
-  <path
-    d="M5 10h10"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+  <circle
+    cx="10"
+    cy="10"
+    r="5.5"
+    fill="currentColor"
   />,
   modifiedTablerIconProps,
 );
 
 export const StrokeWidthExtraBoldIcon = createIcon(
-  <path
-    d="M5 10h10"
-    stroke="currentColor"
-    strokeWidth="3.75"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+  <circle
+    cx="10"
+    cy="10"
+    r="7"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+// Dot-based stroke width icons
+export const StrokeWidthExtraThinIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="1.5"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthThinIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="2.5"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthNormalIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="3.5"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthMediumIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="4.5"
+    fill="currentColor"
   />,
   modifiedTablerIconProps,
 );
@@ -1872,6 +1911,28 @@ export const laserPointerToolIcon = createIcon(
     <path d="m13.25 3.417 3.333 3.333M10 10l2-2M5 15l3-3M2.156 17.894l1-1M5.453 19.029l-.144-1.407M2.377 11.887l.866 1.118M8.354 17.273l-1.194-.758M.953 14.652l1.408.13" />
   </g>,
 
+  20,
+);
+
+export const annotationToolIcon = createIcon(
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.25"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {/* Marker/pen body */}
+    <path d="M3 17l6-6 4 4-6 6H3v-4z" />
+    {/* Marker tip */}
+    <path d="M9 11l4 4" />
+    {/* Cap */}
+    <circle cx="15" cy="7" r="2" />
+    {/* Glowing effect dots */}
+    <circle cx="6" cy="18" r="0.5" fill="currentColor" opacity="0.6" />
+    <circle cx="8" cy="16" r="0.3" fill="currentColor" opacity="0.4" />
+    <circle cx="10" cy="14" r="0.3" fill="currentColor" opacity="0.4" />
+  </g>,
   20,
 );
 

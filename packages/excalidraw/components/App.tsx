@@ -4920,6 +4920,11 @@ private async maybeInsertPdfFromQueryParam() {
         activeEmbeddable: null,
       } as const;
 
+      // Clear annotation trails when switching away from annotation tool
+      if (prevState.activeTool.type === "annotation" && nextActiveTool.type !== "annotation") {
+        this.laserTrails.clearTrails();
+      }
+
       if (nextActiveTool.type === "freedraw") {
         this.store.scheduleCapture();
       }
@@ -6916,6 +6921,11 @@ private async maybeInsertPdfFromQueryParam() {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.state.activeTool.type === "annotation") {
+      this.laserTrails.startPath(
+        pointerDownState.lastCoords.x,
+        pointerDownState.lastCoords.y,
+      );
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -8545,6 +8555,10 @@ private async maybeInsertPdfFromQueryParam() {
       }
 
       if (this.state.activeTool.type === "laser") {
+        this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
+      }
+
+      if (this.state.activeTool.type === "annotation") {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
@@ -10199,6 +10213,11 @@ private async maybeInsertPdfFromQueryParam() {
       }
 
       if (activeTool.type === "laser") {
+        this.laserTrails.endPath();
+        return;
+      }
+
+      if (activeTool.type === "annotation") {
         this.laserTrails.endPath();
         return;
       }

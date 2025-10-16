@@ -68,6 +68,7 @@
     "hachure": "Hachure",
     "zigzag": "Zigzag",
     "crossHatch": "Cross-hatch",
+    "extraThin": "Extra thin",
     "thin": "Thin",
     "bold": "Bold",
     "left": "Left",
@@ -254,7 +255,8 @@
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
-    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
+    "localStorageQuotaExceeded": "Browser storage quota exceeded. Changes will not be saved."
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
@@ -299,6 +301,7 @@
     "penMode": "Pen mode - prevent touch",
     "link": "Add / Update link for a selected shape",
     "eraser": "Eraser",
+    "annotation": "Annotation",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
