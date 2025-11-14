@@ -131,7 +131,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     local: true,
     fallback: true,
   },
-  [FONT_FAMILY.Vazir]: {
+  [FONT_FAMILY.YRD]: {
   metrics: {
     unitsPerEm: 1000,
     ascender: 900,
