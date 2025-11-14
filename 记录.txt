@@ -7,3 +7,13 @@ git cherry-pick 886702c49384d66b58834f08065708761b233388
 
 回退
 git cherry-pick --abort
+
+# 1. 添加所有修改和新文件到暂存区
+git add .
+
+# 2. 提交暂存区的内容（填写清晰的提交信息，比如“新增何塘字体相关文件及配置”）
+git commit -m "你的提交信息"
+
+步骤 2：推送本地提交到远程
+bash
+git push origin master
