@@ -139,6 +139,14 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     lineHeight: 1.25,
   },
 },
+ [FONT_FAMILY.HeTang]: {
+  metrics: {
+    unitsPerEm: 1000,
+    ascender: 900,
+    descender: -200,
+    lineHeight: 1.25,
+  },
+},
 };
 
 /** Unicode ranges defined by google fonts */

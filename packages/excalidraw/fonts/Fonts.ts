@@ -42,6 +42,8 @@ import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 import { YRDFontFaces } from "./YRD";
+import { HeTangFontFaces } from "./HeTang";
+
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -393,10 +395,11 @@ export class Fonts {
     init("Nunito", ...NunitoFontFaces);
     init("Virgil", ...VirgilFontFaces);
 
-    // fallback font faces
+    // fallback font faces 
     init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);
     init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
     init("YRD", ...YRDFontFaces);
+    init("HeTang", ...HeTangFontFaces);
 
     Fonts._initialized = true;
 
